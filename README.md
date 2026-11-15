@@ -8,7 +8,7 @@
 2. Enter `https://github.com/Frameleaf/runtipi-appstore` as the URL.
 3. Open the **App store**, find **Frameleaf** and install it.
 
-Runtipi 4.5 or later is required. The library is stored in `media/data/images/frameleaf` in your Runtipi folder. Guide: [frameleaf.app/docs/nas/runtipi](https://frameleaf.app/docs/nas/runtipi/).
+Runtipi 4.5 or later is required. The library is stored in `media/data/images/frameleaf` in your Runtipi folder. Guide: [frameleaf.app/docs/nas/app-stores](https://frameleaf.app/docs/nas/app-stores/#runtipi).
 
 The app follows the latest Frameleaf release; when a new release ships, Runtipi offers the update. Frameleaf is in beta: keep another copy of your photos and videos.
 

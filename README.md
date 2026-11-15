@@ -1,31 +1,19 @@
-# Example App Store Template
+# Frameleaf app store for Runtipi
 
-This repository serves as a template for creating your own custom app store for the Runtipi platform. Use this as a starting point to create and share your own collection of applications.
+[Frameleaf](https://frameleaf.app) is a self-hosted photo and video library. This repository is a [Runtipi](https://runtipi.io) app store with one app: Frameleaf (server, machine learning and PostgreSQL).
 
-## Repository Structure
+## Add the store
 
-- **apps/**: Contains individual app directories
+1. In Runtipi, open **Settings → App stores** and choose **Add app store**.
+2. Enter `https://github.com/Frameleaf/runtipi-appstore` as the URL.
+3. Open the **App store**, find **Frameleaf** and install it.
 
-  - Each app has its own folder (e.g., `whoami/`) with the following structure:
-    - `config.json`: App configuration file
-    - `docker-compose.json`: Docker setup for the app
-    - `metadata/`: Contains app visuals and descriptions
-      - `description.md`: Markdown description of the app
-      - `logo.jpg`: App logo image
+Runtipi 4.5 or later is required. The library is stored in `media/data/images/frameleaf` in your Runtipi folder. Guide: [frameleaf.app/docs/nas/app-stores](https://frameleaf.app/docs/nas/app-stores/#runtipi).
 
-- **tests/**: Contains test files for the app store
+The app follows the latest Frameleaf release; when a new release ships, Runtipi offers the update. Frameleaf is in beta: keep another copy of your photos and videos.
 
-  - `apps.test.ts`: Test suite for validating apps
+## Development
 
-## Getting Started
+`bun install && bun test` validates `config.json` and `docker-compose.json` against Runtipi's schemas. CI also starts the stack from `docker-compose.json` and checks that the server and machine learning answer.
 
-This repository is intended to serve as a template for creating your own app store. Follow these steps to get started:
-
-1. Click the "Use this template" button to create a new repository based on this template
-2. Customize the apps or add your own app folders in the `apps/` directory
-3. Test your app store by using it with Runtipi
-
-## Documentation
-
-For detailed instructions on creating your own app store, please refer to the official guide:
-[Create Your Own App Store Guide](https://runtipi.io/docs/guides/create-your-own-app-store)
+Source: [Frameleaf/frameleaf-app](https://github.com/Frameleaf/frameleaf-app) (AGPL-3.0). Questions: support@frameleaf.app.

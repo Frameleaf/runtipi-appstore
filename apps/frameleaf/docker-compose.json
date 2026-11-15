@@ -1,0 +1,112 @@
+{
+  "$schema": "https://schemas.runtipi.io/dynamic-compose.json",
+  "schemaVersion": 2,
+  "services": [
+    {
+      "name": "frameleaf-server",
+      "image": "ghcr.io/frameleaf/frameleaf-server:latest",
+      "isMain": true,
+      "internalPort": 2283,
+      "environment": [
+        {
+          "key": "DB_HOSTNAME",
+          "value": "frameleaf-db"
+        },
+        {
+          "key": "DB_USERNAME",
+          "value": "frameleaf"
+        },
+        {
+          "key": "DB_PASSWORD",
+          "value": "${FRAMELEAF_DB_PASSWORD}"
+        },
+        {
+          "key": "DB_DATABASE_NAME",
+          "value": "frameleaf"
+        },
+        {
+          "key": "FRAMELEAF_MACHINE_LEARNING_URL",
+          "value": "http://frameleaf-machine-learning:3003"
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "${ROOT_FOLDER_HOST}/media/data/images/frameleaf",
+          "containerPath": "/data"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/studio-worker",
+          "containerPath": "/run/frameleaf/studio-worker"
+        },
+        {
+          "hostPath": "/etc/localtime",
+          "containerPath": "/etc/localtime",
+          "readOnly": true
+        }
+      ],
+      "dependsOn": {
+        "frameleaf-db": {
+          "condition": "service_healthy"
+        }
+      },
+      "shmSize": "2gb",
+      "stopGracePeriod": "10s"
+    },
+    {
+      "name": "frameleaf-machine-learning",
+      "image": "ghcr.io/frameleaf/frameleaf-machine-learning:latest",
+      "environment": [
+        {
+          "key": "FRAMELEAF_STUDIO_WORKER_SERVER_URL",
+          "value": "http://frameleaf-server:2283"
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/model-cache",
+          "containerPath": "/cache"
+        },
+        {
+          "hostPath": "${APP_DATA_DIR}/data/studio-worker",
+          "containerPath": "/run/frameleaf/studio-worker",
+          "readOnly": true
+        }
+      ]
+    },
+    {
+      "name": "frameleaf-db",
+      "image": "ghcr.io/frameleaf/frameleaf-postgres:19rc1-pgvector0.8.7@sha256:3efd98096adf147872590ebdb31ffd58ee18de5e54e2309ca431417279b629ff",
+      "environment": [
+        {
+          "key": "POSTGRES_USER",
+          "value": "frameleaf"
+        },
+        {
+          "key": "POSTGRES_PASSWORD",
+          "value": "${FRAMELEAF_DB_PASSWORD}"
+        },
+        {
+          "key": "POSTGRES_DB",
+          "value": "frameleaf"
+        },
+        {
+          "key": "POSTGRES_INITDB_ARGS",
+          "value": "--data-checksums"
+        }
+      ],
+      "volumes": [
+        {
+          "hostPath": "${APP_DATA_DIR}/data/postgres",
+          "containerPath": "/var/lib/postgresql"
+        }
+      ],
+      "shmSize": "128mb",
+      "healthCheck": {
+        "test": "pg_isready --host=127.0.0.1 --dbname=frameleaf --username=frameleaf && /usr/local/bin/healthcheck.sh",
+        "interval": "30s",
+        "startPeriod": "5m",
+        "startInterval": "5s"
+      }
+    }
+  ]
+}

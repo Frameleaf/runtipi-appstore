@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: lan
     permissions:
       contents: write
     env:
@@ -32,7 +32,7 @@ jobs:
       - name: Follow the latest Frameleaf release
         if: env.FOLLOW_LATEST == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_PUBLISH_TOKEN }}
         run: |
           latest=$(gh release view -R Frameleaf/frameleaf-app --json tagName -q .tagName | sed 's/^frameleaf-v//')
           current=$(jq -r .version apps/frameleaf/config.json)
@@ -61,11 +61,15 @@ jobs:
         if: failure()
         run: docker compose -p frameleaf -f "$RUNNER_TEMP/compose.json" logs --tail 200
 
+      # GitHub is the public source Runtipi reads, so the bump goes there first, then to the Forgejo mirror.
       - name: Commit the update
         if: env.FOLLOW_LATEST == 'true'
+        env:
+          GH_PUSH_TOKEN: ${{ secrets.GH_PUBLISH_TOKEN }}
         run: |
           git diff --quiet && exit 0
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name 'Frameleaf CI'
+          git config user.email 'ci@frameleaf.app'
           git commit -am "Update Frameleaf to $(jq -r .version apps/frameleaf/config.json)"
+          git push "https://x-access-token:${GH_PUSH_TOKEN}@github.com/Frameleaf/runtipi-appstore.git" HEAD:refs/heads/main
           git push origin HEAD:refs/heads/main
